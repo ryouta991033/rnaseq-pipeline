@@ -1,0 +1,153 @@
+project:
+  name: rnaseq-aging
+
+# --------------------
+# AWS
+# --------------------
+aws:
+  bucket: your-s3-bucket
+  region: your-aws-region
+  results_prefix: rnaseq-aging
+
+# --------------------
+# download（★書き込み先は data 以下）
+# --------------------
+download:
+  raw_fastq_dir: "data/fastq"
+
+  reference:
+    base_dir: "data/reference"
+    fasta_dir: "data/reference/fasta"
+    gtf_dir:   "data/reference/gtf"
+
+    fasta:
+      url: "ftp://ftp.ensembl.org/pub/release-112/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz"
+      name: "Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz"
+
+    gtf:
+      url: "ftp://ftp.ensembl.org/pub/release-112/gtf/caenorhabditis_elegans/Caenorhabditis_elegans.WBcel235.112.gtf.gz"
+      name: "Caenorhabditis_elegans.WBcel235.112.gtf.gz"
+
+# --------------------
+# samples
+# --------------------
+samples:
+  sample1:
+    sra: SRR11245223
+    condition: L4
+    layout: SE
+  sample2:
+    sra: SRR11245222
+    condition: L4
+    layout: SE
+  sample3:
+    sra: SRR11245225
+    condition: D6
+    layout: SE
+  sample4:
+    sra: SRR11245226
+    condition: D6
+    layout: SE
+# --------------------
+# userdata（追加分）
+# --------------------
+#userdata:
+#  user_sample1:
+#    layout: SE
+#    fq1: data/fastq/user_sample1/user_sample1.fastq.gz
+#    condition: D6
+    
+
+# --------------------
+# mapper
+# --------------------
+mapper: star   # star | hisat2
+
+# --------------------
+# QC
+# --------------------
+qc:
+  fastqc: true
+  multiqc: true
+
+# --------------------
+# work / output
+# --------------------
+workdir: data
+outdir: results
+
+# --------------------
+# threads
+# --------------------
+threads:
+  fasterq: 4
+  pigz: 8
+  trimmomatic: 4
+  star: 8
+  hisat2: 8
+  samtools: 4
+  featurecounts: 4
+
+# --------------------
+# trimming
+# --------------------
+trim:
+  enable: true
+  trimmomatic_opts: "SLIDINGWINDOW:4:20 MINLEN:36"
+  adapters: "adapters/TruSeq3-PE.fa"
+
+# --------------------
+# raw data paths（参照用）
+# --------------------
+raw:
+  fastq: "data/fastq"
+  metadata: "data/metadata.tsv"
+
+# --------------------
+# reference paths（参照用）
+# --------------------
+reference:
+  fasta:        "data/reference/fasta/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz"
+  gtf:          "data/reference/gtf/Caenorhabditis_elegans.WBcel235.112.gtf.gz"
+  star_index:   "results/reference/STAR_index"
+  hisat2_index: "results/reference/hisat2_index"
+  read_length: 150
+
+# --------------------
+# quantification
+# --------------------
+featurecounts:
+  stranded: 0
+  paired: false
+  extra_opts: ""      # featureCounts に追加オプションが必要な場合に使用
+
+# --------------------
+# DESeq2
+# --------------------
+deseq2:
+  design: "~ condition"
+  contrast:
+    factor: "condition"
+    numerator: "L4"
+    denominator: "D6"
+  reference:
+    condition: "L4"
+  # 追加：サンプル条件の順序を SAMPLES に対応させる
+
+# --------------------
+# results
+# --------------------
+results:
+  base:     "results"
+  bam:      "results/bam"
+  counts:   "results/counts"
+  deseq2:   "results/deseq2"
+  qc:       "results/qc"
+  multiqc:  "results/multiqc"
+  logs:     "results/logs"
+
+# --------------------
+# logs
+# --------------------
+logs:
+  snakemake: "results/logs/snakemake"
