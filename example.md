@@ -19,3 +19,11 @@ Clear separation between L4 and Day 6 samples
 Replicates cluster together
 Indicates global transcriptomic remodeling during early aging
 <img width="1800" height="1500" alt="DESeq2_PCA" src="https://github.com/user-attachments/assets/7c807d5f-127f-4cf0-b9a0-a20aa4cca92e" />
+
+Biological Interpretation
+
+The transition from L4 to Day 6 shows:
+Activation of stress-response related genes
+Metabolic reprogramming signatures
+Age-associated transcriptional shifts
+Due to limited biological replicates (n=2 per group), results should be interpreted cautiously.
