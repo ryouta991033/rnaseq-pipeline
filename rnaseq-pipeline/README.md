@@ -25,7 +25,7 @@ Designed for research reproducibility and infrastructure-aware execution.
 ## Quick Start
 1. Clone Repository
 ```
-git clone https://github.com/yourname/rnaseq-aging.git
+git clone https://github.com/ryouta991033/rnaseq-pipeline.git
 cd rnaseq-aging
 ```
 
