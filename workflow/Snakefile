@@ -1,32 +1,25 @@
 ################################
-# workflow/Snakefile (Docker安定版 + S3ログ同期 修正版)
+# workflow/Snakefile
+# Docker安定版 + plots統合版 + S3同期修正版
 ################################
 
 import os
 import pandas as pd
 import glob
 
-# -----------------------------
-# プロジェクトルート
-# -----------------------------
-PROJECT_DIR = os.getcwd()
-
 configfile: "config/config.yaml"
 
 # -----------------------------
 # サンプル読み込み
 # -----------------------------
-SAMPLES_TSV = "samples.tsv"
-samples = pd.read_csv(SAMPLES_TSV, sep="\t")
-
+samples = pd.read_csv("samples.tsv", sep="\t")
 SAMPLES = samples["sample"].tolist()
 
 SE_SAMPLES = samples.query("layout == 'SE'")["sample"].tolist()
 PE_SAMPLES = samples.query("layout == 'PE'")["sample"].tolist()
 
 # -----------------------------
-# FastQ 自動探索関数
-# （※将来使う場合に備えて安全化）
+# FastQ 自動探索
 # -----------------------------
 def fq1(wildcards):
     sample = wildcards.sample
@@ -35,14 +28,13 @@ def fq1(wildcards):
         raise ValueError(f"No FastQ file found for sample {sample}")
     for f in files:
         if "R1" in f or "r1" in f or len(files) == 1:
-            return str(f)
-    return str(files[0])
+            return f
+    return files[0]
 
 def fq2(wildcards):
     sample = wildcards.sample
     files = glob.glob(f"data/fastq/{sample}/*.fastq.gz")
-    r2_files = [f for f in files if "R2" in f or "r2" in f]
-    return [str(f) for f in r2_files] if r2_files else []
+    return [f for f in files if "R2" in f or "r2" in f]
 
 # -----------------------------
 # ルール読み込み
@@ -51,9 +43,10 @@ include: "rules/trim.smk"
 include: "rules/build_index.smk"
 include: "rules/align.smk"
 include: "rules/count.smk"
+include: "rules/plots.smk"   # ← 可視化統合
 
 # -----------------------------
-# mapper に応じた index 指定
+# mapperに応じたindex指定
 # -----------------------------
 MAPPER = config.get("mapper", "star")
 
@@ -65,7 +58,7 @@ else:
     raise ValueError(f"Unsupported mapper: {MAPPER}")
 
 # -----------------------------
-# S3 設定
+# S3設定
 # -----------------------------
 AWS_BUCKET = config["aws"]["bucket"]
 AWS_PREFIX = config["aws"]["results_prefix"]
@@ -74,25 +67,29 @@ RUN_LOG = "results/snakemake_run.log"
 STATS_FILE = "results/snakemake_stats.json"
 
 # -----------------------------
-# S3 同期ルール（ダミー出力付き）
+# S3同期
 # -----------------------------
 rule sync_s3:
     input:
+        # DESeq2出力
         "results/deseq2/DESeq2_results_all.csv",
         "results/deseq2/DESeq2_results_significant.csv",
-        "results/deseq2/DESeq2_PCA.png"
+
+        # plots出力（新構成）
+        "results/plots/PCA_plot.png",
+        "results/plots/volcano_plot.pdf",
+        "results/plots/heatmap.pdf"
     output:
         "results/.s3_sync_done"
     shell:
         r"""
         set -euo pipefail
 
-        echo "[INFO] Syncing results directory..."
+        echo "[INFO] Syncing results..."
         aws s3 sync results \
             s3://{AWS_BUCKET}/{AWS_PREFIX}/results \
             --delete
 
-        echo "[INFO] Syncing snakemake internal logs..."
         if [ -d ".snakemake/log" ]; then
             aws s3 sync .snakemake/log \
                 s3://{AWS_BUCKET}/{AWS_PREFIX}/snakemake_logs \
@@ -110,30 +107,31 @@ rule sync_s3:
         fi
 
         touch {output}
-
-        echo "[INFO] S3 synchronization complete."
         """
 
 # -----------------------------
-# rule all（正しい依存関係）
+# rule all
 # -----------------------------
 rule all:
     input:
-        # インデックス
+        # index
         INDEX_TARGET,
 
-        # BAM + index
+        # BAM
         expand("results/bam/{sample}.bam", sample=SAMPLES),
         expand("results/bam/{sample}.bam.bai", sample=SAMPLES),
 
-        # featureCounts
+        # counts
         "results/counts/gene_counts.txt",
 
-        # DESeq2 出力
+        # DESeq2
         "results/deseq2/DESeq2_results_all.csv",
         "results/deseq2/DESeq2_results_significant.csv",
-        "results/deseq2/DESeq2_PCA.png",
 
-        # S3 同期完了フラグ
+        # plots（新構成）
+        "results/plots/PCA_plot.png",
+        "results/plots/volcano_plot.pdf",
+        "results/plots/heatmap.pdf",
+
+        # S3完了フラグ
         "results/.s3_sync_done"
-
