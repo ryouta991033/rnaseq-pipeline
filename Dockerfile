@@ -72,6 +72,10 @@ RUN conda install -y -c conda-forge -c bioconda \
     bioconductor-tximport \
     r-optparse \
     r-tidyverse \
+    r-pheatmap \
+    r-ggplot2 \
+    r-ggrepel \
+    bioconductor-rtracklayer \
  && conda clean -afy
 
 # =====================================================
