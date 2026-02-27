@@ -3,7 +3,46 @@
 ################################
 
 import os
+# =============================
+# PCA
+# =============================
+rule pca_plot:
+    input:
+        rld="results/deseq2/rld.rds"
+    output:
+        "results/plots/PCA_plot.png"
+    threads: 1
+    run:
+        os.makedirs(os.path.dirname(output[0]), exist_ok=True)
 
+        r_script = f"""
+        library(DESeq2)
+        library(ggplot2)
+
+        dds <- readRDS("{input.rld}")
+        rld <- rlog(dds, blind=TRUE)
+
+        pca_data <- plotPCA(rld,
+                            intgroup="condition",
+                            returnData=TRUE)
+
+        percentVar <- round(100 * attr(pca_data, "percentVar"))
+
+        p <- ggplot(pca_data,
+                    aes(PC1, PC2, color=condition)) +
+             geom_point(size=3) +
+             xlab(paste0("PC1: ", percentVar[1], "% variance")) +
+             ylab(paste0("PC2: ", percentVar[2], "% variance")) +
+             theme_bw()
+
+        ggsave("{output[0]}", plot=p, width=6, height=5)
+        """
+
+        script_path = "results/plots/pca_tmp.R"
+        with open(script_path, "w") as f:
+            f.write(r_script)
+
+        shell(f"Rscript {script_path}")
 # =============================
 # Volcano plot（Top10遺伝子名表示）
 # =============================
