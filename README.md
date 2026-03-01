@@ -23,6 +23,7 @@ Designed for research reproducibility and infrastructure-aware execution.
 - Centralized resource management (thread control)
 
 ## Quick Start
+0. As a first step, please attach an IAM role that includes S3AllFreeAccess permissions to the EC2 instance.
 1. Clone Repository
 ```
 git clone https://github.com/ryouta991033/rnaseq-pipeline.git
