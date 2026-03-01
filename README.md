@@ -177,3 +177,42 @@ If this pipeline supports your research, please cite appropriately or reference 
 - Signals architectural maturity
 - Matches structure used in high-quality bioinformatics pipelines
 - Looks appropriate for international collaboration
+
+## Sample Analysis: L4 vs D6 Comparison
+Below are representative outputs generated automatically by this RNA-seq pipeline using a test dataset comparing L4 and D6 conditions.
+
+All figures are reproducible and generated directly from raw FASTQ files using the standardized workflow.
+PCA Plot
+
+## The PCA plot summarizes global transcriptomic variation across samples.
+- Samples cluster according to biological condition (L4 vs D6).
+- Replicates group tightly together, indicating good data quality.
+- The primary principal component captures condition-specific expression differences.
+This confirms that the experimental groups are clearly separated at the transcriptome-wide level.
+<img width="1800" height="1500" alt="PCA_plot" src="https://github.com/user-attachments/assets/69692beb-dd4b-4c2c-8a3d-195936f50f40" />
+
+## Heatmap (Top Differentially Expressed Genes)
+The heatmap shows the top differentially expressed genes ranked by adjusted p-value.
+- Expression values are variance-stabilized (DESeq2 VST).
+- Genes are scaled across samples.
+- Clear condition-specific expression patterns are observed.
+This visualization highlights robust transcriptional differences between L4 and D6.
+[heatmap.pdf](https://github.com/user-attachments/files/25660092/heatmap.pdf)
+
+## Volcano Plot
+The volcano plot displays:
+- log2 Fold Change (x-axis)
+- –log10 Adjusted p-value (y-axis)
+- Significantly regulated genes are automatically highlighted.
+This allows rapid identification of biologically meaningful upregulated and downregulated genes.
+[volcano_plot.pdf](https://github.com/user-attachments/files/25660093/volcano_plot.pdf)
+
+## Reproducibility
+All visualizations are:
+- Fully automated
+- Docker-compatible
+- Generated via Snakemake workflow
+- Reproducible from raw FASTQ files
+The pipeline is designed to provide publication-ready figures with minimal manual intervention.
+
+This workflow can be customized for external datasets and adapted to specific experimental designs (e.g., multi-group comparisons, time-series, batch correction).
