@@ -197,7 +197,7 @@ The heatmap shows the top differentially expressed genes ranked by adjusted p-va
 - Genes are scaled across samples.
 - Clear condition-specific expression patterns are observed.
 This visualization highlights robust transcriptional differences between L4 and D6.
-[heatmap.pdf](https://github.com/user-attachments/files/25660092/heatmap.pdf)
+<img width="1200" height="1600" alt="214f2658-1" src="https://github.com/user-attachments/assets/cd91cdfb-35b3-485c-b7cf-64607d17b584" />
 
 ## Volcano Plot
 The volcano plot displays:
@@ -205,7 +205,8 @@ The volcano plot displays:
 - –log10 Adjusted p-value (y-axis)
 - Significantly regulated genes are automatically highlighted.
 This allows rapid identification of biologically meaningful upregulated and downregulated genes.
-[volcano_plot.pdf](https://github.com/user-attachments/files/25660093/volcano_plot.pdf)
+<img width="1200" height="1000" alt="34cc059e-1" src="https://github.com/user-attachments/assets/aa0d239f-3884-43eb-aa9c-b2c1f12c501e" />
+
 
 ## Reproducibility
 All visualizations are:
